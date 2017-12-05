@@ -5,20 +5,11 @@
 % disque( IdDisque, IdGroupe, TitreDisque)
 % chanson( TitreChanson, IdDisque, [ Caracteristique ], Duree )
 
-% liste([[Caracteristique]], [[NomGroupe, TitreDisque, TitreChanson, Duree]]).
+chansonSelonGroupe(IdGroupe, TitreChanson) :- groupe(IdGroupe, _, _), disque(IdDisque, IdGroupe, _), chanson(TitreChanson, IdDisque, _, _).
+chansonSelonCaracteristique(Caracteristique, TitreChanson) :- chanson(TitreChanson,_, LC, _), member(Caracteristique, LC).
+chansonsDeGroupeEtCaracteristique(Caracteristique, Chanson) :- chansonSelonCaracteristique(Caracteristique, Chanson); (groupe(IdGroupe, _, LC), member(Caracteristique, LC), chansonSelonGroupe(IdGroupe, Chanson)).
 
-% uneCaracteristique(C, L) :- chanson(TitreChanson, IdDisque, LC1, _), member(C, LC1), disque(IdDisque, IdGroupe, _), groupe(IdGroupe, _, LC2), member(C, LC2), L is TitreChanson.
+chansonsDeGroupeEtCaracteristiques([Caracteristique], Chanson) :- chansonsDeGroupeEtCaracteristique(Caracteristique, Chanson).
+chansonsDeGroupeEtCaracteristiques([Caracteristique|R], Chanson) :- chansonsDeGroupeEtCaracteristique(Caracteristique, Chanson), chansonsDeGroupeEtCaracteristiques(R, Chanson).
 
-
-
-
-
-
-
-uneCaracteristique(Caracteristique, TitreChanson) :- chanson(TitreChanson,_,LC,_), member(Caracteristique, LC).
-
-chansonGroupeSelonCaracteristique(IdGroupe, Caracteristique, TitreChanson) :-((chanson(TitreChanson, IdDisque, LCC, _), member(Caracteristique, LCC)); (groupe(IdGroupe,_ , LCG), member(Caracteristique, LCG))), disque(IdDisque, IdGroupe, _).
-
-toutesLesChansonsDunGroupe(IdGroupe, Chansons) :- findall((IdGroupe, TitreChanson), (groupe(IdGroupe, _, _), disque(IdDisque, IdGroupe, _), chanson(TitreChanson, IdDisque, _, _)), Chansons).
-
-toutesLesChansonsSelonCaracteristique(Caracteristique, Chansons) :- findall(TitreChanson,(chanson(TitreChanson,_, LC, _), member(Caracteristique, LC)),Chansons).
+donneInfosSelonChanson(TitreChanson, Infos) :- findall((NomGroupe, TitreDisque, TitreChanson, Duree),(chanson(TitreChanson, IdDisque, _, Duree), disque(IdDisque, IdGroupe, TitreDisque), groupe(IdGroupe, NomGroupe, _)), Infos).
