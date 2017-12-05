@@ -1,10 +1,12 @@
 
+% groupe( IdGroupe, NomGroupe, [ Caracteristique ] )
 groupe( m83, "M83", [ alternatif, indie, rock, electronique, ambient ] ).
 groupe( ayreon, "Ayreon", [ heavy_metal, neo_prog, prog_rock, progressive_metal ] ).
 groupe( skrillex, "Skrillex", [ dubstep, edm, club, dance ] ).
 groupe( fla, "Front Line Assembly", [ club, scary ] ).
 groupe( fabrikc, "Fabrik C", [ electronique ] ).
 
+% disque( IdDisque, IdGroupe, TitreDisque)
 disque( bdhu, m83, "Before the Dawn Heals Us" ).
 disque( caustic, fla, "Caustic Grip" ).
 disque( tactical, fla, "Tactical Neural Implant" ).
@@ -16,6 +18,7 @@ disque( itec2, ayreon, "into the Electric Castle (disk 2)" ).
 disque( recess, skrillex, "Recess" ).
 disque( gsc, fla, "Gashed Senses & Crossfire" ).
 
+% chanson( TitreChanson, IdDisque, [ Caracteristique ], Duree )
 chanson( "Final Impact", tactical, [intense, hypnotique], 362 ).
 chanson( "The Blade", tactical, [intense, energetique], 353 ).
 chanson( "Mindphaser", tactical, [intense, volatile], 304 ).
