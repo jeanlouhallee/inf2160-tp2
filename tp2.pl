@@ -5,11 +5,18 @@
 % disque( IdDisque, IdGroupe, TitreDisque)
 % chanson( TitreChanson, IdDisque, [ Caracteristique ], Duree )
 
-chansonSelonGroupe(IdGroupe, TitreChanson) :- groupe(IdGroupe, _, _), disque(IdDisque, IdGroupe, _), chanson(TitreChanson, IdDisque, _, _).
-chansonSelonCaracteristique(Caracteristique, TitreChanson) :- chanson(TitreChanson,_, LC, _), member(Caracteristique, LC).
-chansonsDeGroupeEtCaracteristique(Caracteristique, Chanson) :- chansonSelonCaracteristique(Caracteristique, Chanson); (groupe(IdGroupe, _, LC), member(Caracteristique, LC), chansonSelonGroupe(IdGroupe, Chanson)).
+donneInfosSelonChanson(TitreChanson, Infos) :- findall([NomGroupe, TitreDisque, TitreChanson, Duree],(chanson(TitreChanson, IdDisque, _, Duree), disque(IdDisque, IdGroupe, TitreDisque), groupe(IdGroupe, NomGroupe, _)), Infos).
 
-chansonsDeGroupeEtCaracteristiques([Caracteristique], Chanson) :- chansonsDeGroupeEtCaracteristique(Caracteristique, Chanson).
-chansonsDeGroupeEtCaracteristiques([Caracteristique|R], Chanson) :- chansonsDeGroupeEtCaracteristique(Caracteristique, Chanson), chansonsDeGroupeEtCaracteristiques(R, Chanson).
+chansonSelonGroupe(IdGroupe, Info) :- groupe(IdGroupe, _, _), disque(IdDisque, IdGroupe, _), chanson(TitreChanson, IdDisque, _, _), donneInfosSelonChanson(TitreChanson, Info).
 
-donneInfosSelonChanson(TitreChanson, Infos) :- findall((NomGroupe, TitreDisque, TitreChanson, Duree),(chanson(TitreChanson, IdDisque, _, Duree), disque(IdDisque, IdGroupe, TitreDisque), groupe(IdGroupe, NomGroupe, _)), Infos).
+chansonSelonCaracteristique(Caracteristique, Info) :- chanson(TitreChanson,_, LC, _), member(Caracteristique, LC), donneInfosSelonChanson(TitreChanson, Info).
+
+chansonsDeGroupeEtCaracteristique(Caracteristique, Info) :- chansonSelonCaracteristique(Caracteristique, Info); (groupe(IdGroupe, _, LC), member(Caracteristique, LC), chansonSelonGroupe(IdGroupe, Info)).
+
+chansonsDeGroupeEtCaracteristiques([Caracteristique], Info) :- chansonsDeGroupeEtCaracteristique(Caracteristique, Info).
+chansonsDeGroupeEtCaracteristiques([Caracteristique|R], Info) :- chansonsDeGroupeEtCaracteristique(Caracteristique, Info), chansonsDeGroupeEtCaracteristiques(R, Info).
+
+playlistEt(Caracteristiques, Infos) :- findall(Chanson, chansonsDeGroupeEtCaracteristiques(Caracteristiques, Chanson), Infos).
+
+liste([Caracteristique], Playlist) :- playlistEt(Caracteristique, Playlist), !.
+liste([Caracteristique|R], Playlist) :- playlistEt(Caracteristique, Playlist); liste(R, Playlist).
