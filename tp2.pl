@@ -5,18 +5,25 @@
 % disque( IdDisque, IdGroupe, TitreDisque)
 % chanson( TitreChanson, IdDisque, [ Caracteristique ], Duree )
 
-donneInfosSelonChanson(TitreChanson, Infos) :- findall([NomGroupe, TitreDisque, TitreChanson, Duree],(chanson(TitreChanson, IdDisque, _, Duree), disque(IdDisque, IdGroupe, TitreDisque), groupe(IdGroupe, NomGroupe, _)), Infos).
+% Permet de retourner les informations nécéssaires pour l'affichage à partir d'un titre de chanson.
+donneInfosSelonChansons(TitresChansons, Infos) :- findall([NomGroupe, TitreDisque, TitreChanson, Duree], (chanson(TitreChanson, IdDisque, _, Duree), member(TitreChanson, TitresChansons), disque(IdDisque, IdGroupe, TitreDisque), groupe(IdGroupe, NomGroupe, _)), Infos).
 
-chansonSelonGroupe(IdGroupe, Info) :- groupe(IdGroupe, _, _), disque(IdDisque, IdGroupe, _), chanson(TitreChanson, IdDisque, _, _), donneInfosSelonChanson(TitreChanson, Info).
+% Permet de trouver toutes les chansons d'un gorupe
+chansonSelonGroupe(IdGroupe, TitreChanson) :- groupe(IdGroupe, _, _), disque(IdDisque, IdGroupe, _), chanson(TitreChanson, IdDisque, _, _).
 
-chansonSelonCaracteristique(Caracteristique, Info) :- chanson(TitreChanson,_, LC, _), member(Caracteristique, LC), donneInfosSelonChanson(TitreChanson, Info).
+% Permet de trouver toutes les chansons qui correspondent à une caractéristique.
+chansonSelonCaracteristique(Caracteristique, TitreChanson) :- chanson(TitreChanson,_, LC, _), member(Caracteristique, LC).
 
-chansonsDeGroupeEtCaracteristique(Caracteristique, Info) :- chansonSelonCaracteristique(Caracteristique, Info); (groupe(IdGroupe, _, LC), member(Caracteristique, LC), chansonSelonGroupe(IdGroupe, Info)).
+% Permet de trouver les chansons selon une caractéristique de chanson ET de groupe.
+chansonDeGroupeEtCaracteristique(Caracteristique, TitreChanson) :- chansonSelonCaracteristique(Caracteristique, TitreChanson); (groupe(IdGroupe, _, LC), member(Caracteristique, LC), chansonSelonGroupe(IdGroupe, TitreChanson)).
 
-chansonsDeGroupeEtCaracteristiques([Caracteristique], Info) :- chansonsDeGroupeEtCaracteristique(Caracteristique, Info).
-chansonsDeGroupeEtCaracteristiques([Caracteristique|R], Info) :- chansonsDeGroupeEtCaracteristique(Caracteristique, Info), chansonsDeGroupeEtCaracteristiques(R, Info).
+% Permet de trouver les chansons selon plusieurs caractérstiques de chanson ET de groupe.
+chansonDeGroupeEtCaracteristiques([Caracteristique], TitresChansons) :- chansonDeGroupeEtCaracteristique(Caracteristique, TitresChansons).
+chansonDeGroupeEtCaracteristiques([Caracteristique|R], TitresChansons) :- chansonDeGroupeEtCaracteristique(Caracteristique, TitresChansons), chansonDeGroupeEtCaracteristiques(R, TitresChansons).
 
-playlistEt(Caracteristiques, Infos) :- findall(Chanson, chansonsDeGroupeEtCaracteristiques(Caracteristiques, Chanson), Infos).
+% Permet de retourner une liste de titres de chanson selon plusieurs caractéristiques
+playlistEt(Caracteristiques, TitresChansons) :- findall(Chanson, chansonDeGroupeEtCaracteristiques(Caracteristiques, Chanson), TitresChansons).
 
-liste([Caracteristique], Playlist) :- playlistEt(Caracteristique, Playlist), !.
-liste([Caracteristique|R], Playlist) :- playlistEt(Caracteristique, Playlist); liste(R, Playlist).
+% Permet de retourner plusieurs listes de titres de chanson (chaque liste est un ensemble de ET, mais les listes sont séparés car ce sont des OU).
+plusieursPlaylist([Caracteristiques], Playlist) :- playlistEt(Caracteristiques, Playlist), !.
+plusieursPlaylist([Caracteristiques|R], Playlist) :-  playlistEt(Caracteristiques, Playlist); plusieursPlaylist(R, Playlist).
