@@ -27,3 +27,10 @@ playlistEt(Caracteristiques, TitresChansons) :- findall(Chanson, chansonDeGroupe
 % Permet de retourner plusieurs listes de titres de chanson (chaque liste est un ensemble de ET, mais les listes sont séparés car ce sont des OU).
 plusieursPlaylist([Caracteristiques], Playlist) :- playlistEt(Caracteristiques, Playlist), !.
 plusieursPlaylist([Caracteristiques|R], Playlist) :-  playlistEt(Caracteristiques, Playlist); plusieursPlaylist(R, Playlist).
+
+
+
+%%%% il faut mainteant créer l'union dans les listes retournés par "plusieursPlaylist" (unir les listes et enlever les doublons).
+%%%% ensuite il s'agit de transformer cette liste de "TitresChanson" par "[NomGroupe, TitreDisque, TitreChanson, Duree]" grâce à la fonction "donneInfosSelonChansons".
+%%%% hésite pas à renommer/modifier des fonctions si tu as des meilleurs idées ;)
+%%% je crois que mes fonctions fonctionnent comme il faut, un deuxième oeil pour tester fera du bien!
