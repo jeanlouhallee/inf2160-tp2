@@ -6,28 +6,28 @@
 % chanson( TitreChanson, IdDisque, [ Caracteristique ], Duree )
 
 % Permet de retourner les informations nécéssaires pour l'affichage à partir d'un titre de chanson.
-donneInfosSelonChansons(TitresChansons, Infos) :- findall([NomGroupe, TitreDisque, TitreChanson, Duree], (chanson(TitreChanson, IdDisque, _, Duree), 
-																											member(TitreChanson, TitresChansons), 
-																											disque(IdDisque, IdGroupe, TitreDisque), 
+donneInfosSelonChansons(TitresChansons, Infos) :- findall([NomGroupe, TitreDisque, TitreChanson, Duree], (chanson(TitreChanson, IdDisque, _, Duree),
+																											member(TitreChanson, TitresChansons),
+																											disque(IdDisque, IdGroupe, TitreDisque),
 																											groupe(IdGroupe, NomGroupe, _)), Infos).
 
 % Permet de trouver toutes les chansons d'un gorupe
-chansonSelonGroupe(IdGroupe, TitreChanson) :- groupe(IdGroupe, _, _), 
-											disque(IdDisque, IdGroupe, _), 
+chansonSelonGroupe(IdGroupe, TitreChanson) :- groupe(IdGroupe, _, _),
+											disque(IdDisque, IdGroupe, _),
 											chanson(TitreChanson, IdDisque, _, _).
 
 % Permet de trouver toutes les chansons qui correspondent à une caractéristique.
-chansonSelonCaracteristique(Caracteristique, TitreChanson) :- chanson(TitreChanson,_, LC, _), 
+chansonSelonCaracteristique(Caracteristique, TitreChanson) :- chanson(TitreChanson,_, LC, _),
 															member(Caracteristique, LC).
 
 % Permet de trouver les chansons selon une caractéristique de chanson ET de groupe.
 chansonDeGroupeEtCaracteristique(Caracteristique, TitreChanson) :- chansonSelonCaracteristique(Caracteristique, TitreChanson);
-																(groupe(IdGroupe, _, LC), member(Caracteristique, LC), 
+																(groupe(IdGroupe, _, LC), member(Caracteristique, LC),
 																chansonSelonGroupe(IdGroupe, TitreChanson)).
 
 % Permet de trouver les chansons selon plusieurs caractérstiques de chanson ET de groupe.
 chansonDeGroupeEtCaracteristiques([Caracteristique], TitresChansons) :- chansonDeGroupeEtCaracteristique(Caracteristique, TitresChansons).
-chansonDeGroupeEtCaracteristiques([Caracteristique|R], TitresChansons) :- chansonDeGroupeEtCaracteristique(Caracteristique, TitresChansons), 
+chansonDeGroupeEtCaracteristiques([Caracteristique|R], TitresChansons) :- chansonDeGroupeEtCaracteristique(Caracteristique, TitresChansons),
 																		chansonDeGroupeEtCaracteristiques(R, TitresChansons).
 
 % Permet de retourner une liste de titres de chanson selon plusieurs caractéristiques
@@ -38,20 +38,16 @@ plusieursPlaylist([Caracteristiques | []], Playlist) :- playlistEt(Caracteristiq
 plusieursPlaylist([Caracteristiques|R], Playlist) :- playlistEt(Caracteristiques, PlaylistEt),
 													plusieursPlaylist(R, PlaylistAutre),
 													append(PlaylistEt, PlaylistAutre, Playlist).
-										
-										
+
+liste(Caracteristiques, Playlist) :- plusieursPlaylist(Caracteristiques, PlaylisteDoublons),
+											trierListe(PlaylisteDoublons, PlaylistSansDoublons),
+											donneInfosSelonChansons(PlaylistSansDoublons, Playlist).
+
 trierListe([Titre|Liste], SansDoublons) :- trierListe(Liste, ListeIntermediaire), !,
 											filterListe(Titre, ListeIntermediaire, SansDoublons), !.
 trierListe([Titre|[]], SansDoublons) :- append([Titre], [], SansDoublons).
-											
-											
+
+
 filterListe(Titre,ListeIntermediaire,SansDoublons) :- \+member(Titre, ListeIntermediaire),
 													append([Titre], ListeIntermediaire, SansDoublons).
-filterListe(_,ListeIntermediaire,SansDoublons):- append([], ListeIntermediaire, SansDoublons).													
-
-
-
-%%%% il faut mainteant créer l'union dans les listes retournés par "plusieursPlaylist" (unir les listes et enlever les doublons).
-%%%% ensuite il s'agit de transformer cette liste de "TitresChanson" par "[NomGroupe, TitreDisque, TitreChanson, Duree]" grâce à la fonction "donneInfosSelonChansons".
-%%%% hésite pas à renommer/modifier des fonctions si tu as des meilleurs idées ;)
-%%% je crois que mes fonctions fonctionnent comme il faut, un deuxième oeil pour tester fera du bien!
+filterListe(_,ListeIntermediaire,SansDoublons):- append([], ListeIntermediaire, SansDoublons).
