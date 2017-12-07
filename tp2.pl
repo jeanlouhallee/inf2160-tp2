@@ -1,5 +1,8 @@
 :- ['Disque.pl'].
 
+% Alexis Millette - MILA24099409
+% Jean-Lou Hallée - HALJ05129309
+% Realise dans SWI Prolog
 
 % groupe( IdGroupe, NomGroupe, [ Caracteristique ] )
 % disque( IdDisque, IdGroupe, TitreDisque)
@@ -38,16 +41,17 @@ plusieursPlaylist([Caracteristiques | []], Playlist) :- playlistEt(Caracteristiq
 plusieursPlaylist([Caracteristiques|R], Playlist) :- playlistEt(Caracteristiques, PlaylistEt),
 													plusieursPlaylist(R, PlaylistAutre),
 													append(PlaylistEt, PlaylistAutre, Playlist).
-
+% Retourne la liste d'informations sur les chansons trouvees selon les caracteristiques donnees
 liste(Caracteristiques, Playlist) :- plusieursPlaylist(Caracteristiques, PlaylisteDoublons),
 											trierListe(PlaylisteDoublons, PlaylistSansDoublons),
 											donneInfosSelonChansons(PlaylistSansDoublons, Playlist).
 
+% Permet de trier la liste en retirant les doublons
 trierListe([Titre|Liste], SansDoublons) :- trierListe(Liste, ListeIntermediaire), !,
 											filterListe(Titre, ListeIntermediaire, SansDoublons), !.
 trierListe([Titre|[]], SansDoublons) :- append([Titre], [], SansDoublons).
 
-
+% Permet de fusionner Titre et ListeIntermediaire dans SansDoublons
 filterListe(Titre,ListeIntermediaire,SansDoublons) :- \+member(Titre, ListeIntermediaire),
 													append([Titre], ListeIntermediaire, SansDoublons).
 filterListe(_,ListeIntermediaire,SansDoublons):- append([], ListeIntermediaire, SansDoublons).
